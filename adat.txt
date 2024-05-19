@@ -1,0 +1,3 @@
+név: Papp Gyula
+szak: Mérnökinformatikus
+neptun-kód: HBTD9H
