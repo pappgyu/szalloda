@@ -1,5 +1,4 @@
 from datetime import datetime, date
-from typing import List
 import sys
 
 class Szoba:
@@ -17,6 +16,9 @@ class EgyagyasSzoba(Szoba):
     pass
 
 class KetagyasSzoba(Szoba):
+    pass
+
+class HaromagyasSzoba(Szoba):
     pass
 
 class Foglalas:
@@ -59,13 +61,13 @@ class Szalloda:
                 new_foglalas = Foglalas(szoba, datum, foglalo_nev)
                 self.foglalasok.append(new_foglalas)
                 return szoba.get_ar()
-        raise ValueError("Nincs ilyen számu szoba a szállodaban.")
+        raise ValueError("Nincs ilyen számú szoba a szállodában.")
 
     def listaz_foglalasok(self):
         if not self.foglalasok:
             print("Nincsenek jelenleg foglalások.")
             return
-        print("Foglalasok listaja:")
+        print("Foglalások listája:")
         for foglalas in self.foglalasok:
             print(f"Szobaszám: {foglalas.get_szoba().get_szobaszam()}, Dátum: {foglalas.get_datum()}, Foglaló neve: {foglalas.get_foglalo_nev()}, Ár: {foglalas.get_szoba().get_ar()} Ft")
 
@@ -74,17 +76,17 @@ class SzallodaInterface:
         self.szalloda = Szalloda("Grand Tokaj")
         self.szalloda.add_szoba(EgyagyasSzoba(1, 20000))
         self.szalloda.add_szoba(KetagyasSzoba(2, 30000))
-        self.szalloda.add_szoba(KetagyasSzoba(3, 40000))
+        self.szalloda.add_szoba(KetagyasSzoba(3, 35000))
 
     def start(self):
         while True:
-            print("Grand Tokaj")
+            print("\nGrand Tokaj")
             print("Válassz egy opciót:")
             print("1. Foglalás")
             print("2. Lemondás")
             print("3. Listázás")
             print("4. Kilépés")
-            choice = input("Opcio: ")
+            choice = input("Opció: ")
             if choice == "1":
                 self.handle_reservation()
             elif choice == "2":
@@ -95,30 +97,38 @@ class SzallodaInterface:
                 print("Kilépés...")
                 sys.exit()
             else:
-                print("Ervénytelen opcio.")
+                print("Érvénytelen opció.")
 
     def handle_reservation(self):
-        room_number = int(input("Add meg a szobaszámot (1, Egyágyas szoba 2, Kétágyas szoba 3, Háromágyas szoba): "))
-        date_str = input("Add meg a dátumot (yyyy-mm-dd): ")
-        datum = datetime.strptime(date_str, '%Y-%m-%d').date()
-        if datum < date.today():
-            print("A Dátum nem lehet a múltban!")
-            return
-        reserver_name = input("Add meg a foglaló nevét: ")
         try:
+            room_number = int(input("Add meg a szobaszámot (1: Egyágyas szoba, 2: Kétágyas szoba, 3: Háromágyas szoba): "))
+            if room_number not in [1, 2, 3]:
+                print("Nincs ilyen számú szoba.")
+                return
+            date_str = input("Add meg a dátumot (yyyy-mm-dd): ")
+            datum = datetime.strptime(date_str, '%Y-%m-%d').date()
+            if datum < date.today():
+                print("A dátum nem lehet a múltban!")
+                return
+            reserver_name = input("Add meg a foglaló nevét: ")
             price = self.szalloda.foglal_szoba(room_number, datum, reserver_name)
             print(f"Foglalás sikeres. Ár: {price} Ft")
         except ValueError as e:
             print(str(e))
+        except Exception as e:
+            print("Hiba történt:", str(e))
 
     def handle_cancellation(self):
-        room_number = int(input("Add meg a szobaszamot: "))
-        date_str = input("Add meg a datumot (yyyy-mm-dd): ")
-        datum = datetime.strptime(date_str, '%Y-%m-%d').date()
-        if self.szalloda.lemond_foglalas(room_number, datum):
-            print("Lemondás sikeres.")
-        else:
-            print("Nincs ilyen foglalás.")
+        try:
+            room_number = int(input("Add meg a szobaszámot: "))
+            date_str = input("Add meg a dátumot (yyyy-mm-dd): ")
+            datum = datetime.strptime(date_str, '%Y-%m-%d').date()
+            if self.szalloda.lemond_foglalas(room_number, datum):
+                print("Lemondás sikeres.")
+            else:
+                print("Nincs ilyen foglalás.")
+        except Exception as e:
+            print("Hiba történt:", str(e))
 
 if __name__ == "__main__":
     interface = SzallodaInterface()
